@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gumstogram</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+      }
+      img {
+        margin: 20px;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px #333;
+        width: 100px;
+        height: 150px;
+      }
+      button {
+        background:#777;
+        margin: 10px;
+        font-size: 18px;
+        border:0;
+        color:#fff;
+      }
+      video {
+        width: 200px;
+        height: 300px;
+        margin: 20px auto;
+        display: block;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px #333;
+      }
+      canvas {
+        display:none
+      }
+    </style>
+    <script>
+      window.addEventListener('load', function() {
+
+        var
+          addElement = function(name, attributes, innerText) {
+            var element = document.createElement(name);
+            for (a in attributes) { element.setAttribute(a, attributes[a]); }
+            if (innerText !== undefined) { element.innerText = innerText; }
+            return document.body.appendChild(element);
+          },
+
+          video = addElement('video', {autoplay:true}),
+          canvas = addElement('canvas', {width:100, height:150}),
+          context = canvas.getContext('2d'),
+          take = addElement('button', null, 'Take!'),
+          photos = addElement('div'),
+          clear = addElement('button', null, 'Clear!'),
+
+          showPhoto = function(src) {
+            var photo = document.createElement('img');
+            photo.src = src;
+            photos.insertBefore(photo, photos.firstChild);
+          },
+          showPhotos = function(src) {
+            for (var l = 0; l < localStorage.length; l++) {
+              showPhoto(localStorage.getItem(l));
+            }
+          },
+          storePhoto = function(src) {
+            localStorage.setItem(localStorage.length, src);
+            showPhoto(src);
+          },
+          clearPhotos = function() {
+            localStorage.clear();
+            photos.innerHTML='';
+          };
+
+        // the bit that matters
+        navigator.getUserMedia(
+          {video: true},
+          function(stream) {
+            video.src = URL.createObjectURL(stream);
+          }
+        );
+
+        take.addEventListener('click', function() {
+          context.drawImage(video, 0, 0, 100, 150);
+          storePhoto(canvas.toDataURL('image/jpeg'));
+        });
+        clear.addEventListener('click', function() {
+          clearPhotos();
+        });
+        showPhotos();
+      });
+    </script>
+
+  </head>
+
+  <body/>
+</html>
